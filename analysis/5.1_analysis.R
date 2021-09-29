@@ -1,21 +1,28 @@
 #-------------------------------------------------------#
 # Modeling Tidal 5.1 (Oct 2019 experiment)
 # This script fits the models compared and presented in Blankenship et al 2022.
-###   Lines __ - __ fit covariates models
-###   Lines __ - __ fit models for question of effect of time after dispersion
+###   Lines 48 - 79 fit covariates models
+###   Lines 82 - 141 fit models for question of effect of time after dispersion
 
 # M. Johnston, M. Espe
 # Tue Sep 28 15:00:21 2021 ------------------------------
 
-# script inputs/dependencies:
+# script inputs
 #-------------------------------------------------------#
 ##   - data_clean/tidal5.1_w_hydro.rds (created in analysis/5.1_data_prep.R)
 ##   - analysis/functions (for convenience fxns)
-##   - artemis (pkg)
+
 
 # script outputs:
 #-------------------------------------------------------#
-##   -
+
+##   - "modK1.0_tidal01.rds" # covariates model with K = 1
+##   - "m0.5_tidal01.rds" # covariates model with K = 0.5
+##   - "m0.1_tidal01.rds" # covariates model with K = 0.1
+##   - "modK1.0_tidal01_disp.rds" # dispersion model with K = 1
+##   - "m0.5_tidal01_disp.rds" # dispersion model with K - 0.5
+##   - "m0.1_tidal01_disp.rds" # dispersion model with K = 0.1
+##   - "uni_mod.rds" # unidirectional model
 
 
 library(artemis)
@@ -133,40 +140,6 @@ mod0.1_disp = eDNA_lmer(Cq ~ scale(K0.1) + stand_dist + disp +  Species + Side +
 summary(mod0.1_disp)
 saveRDS(mod0.1_disp, file.path(res_dir, "m0.1_tidal01_disp.rds")) }
 
-## Combo
-if(refit_models){
-# modK1.0_deploy_combo = eDNA_lmer(Cq ~ scale(K1.0) + stand_dist +
-#                              deploy_combo +
-#                              Species + Side + (1|FilterID),
-#                          data = tidal,
-#                          std_curve_alpha = tidal$std_alpha,
-#                          std_curve_beta = tidal$std_beta,
-#                          seed = 1234,
-#                          cores = Ncores)
-#
-# summary(modK1.0_deploy_combo)
-# saveRDS(modK1.0_deploy_combo, file.path(res_dir, "modK1.0_tidal01_deploy_combo.rds"))
-
-mod0.5_deploy_combo = eDNA_lmer(Cq ~ scale(K0.5) + stand_dist + deploy_combo + Species + Side + (1|FilterID),
-                tidal,
-                std_curve_alpha = tidal$std_alpha,
-                std_curve_beta = tidal$std_beta,
-                seed = 1234,
-                cores = Ncores)
-
-summary(mod0.5_deploy_combo)
-saveRDS(mod0.5_deploy_combo, file.path(res_dir, "m0.5_tidal01_deploy_combo.rds"))
-
-mod0.1_deploy_combo = eDNA_lmer(Cq ~ scale(K0.1) + stand_dist + deploy_combo +  Species + Side + (1|FilterID),
-                tidal,
-                std_curve_alpha = tidal$std_alpha,
-                std_curve_beta = tidal$std_beta,
-                seed = 1234,
-                cores = Ncores)
-
-summary(mod0.1_deploy_combo)
-saveRDS(mod0.1_deploy_combo, file.path(res_dir, "m0.1_tidal01_deploy_combo.rds"))}
-
 
 #-------------------------------------------------------#
 # Compare with CVP and delta distance effects
@@ -222,4 +195,39 @@ mod3 = eDNA_lm(Cq ~ K0.1 + Species,
                 tidal,
                 std_curve_alpha = tidal$std_crv_alpha,
                 std_curve_beta = tidal$std_crv_beta, verbose = TRUE)
+
+## Combo
+if(refit_models){
+# modK1.0_deploy_combo = eDNA_lmer(Cq ~ scale(K1.0) + stand_dist +
+#                              deploy_combo +
+#                              Species + Side + (1|FilterID),
+#                          data = tidal,
+#                          std_curve_alpha = tidal$std_alpha,
+#                          std_curve_beta = tidal$std_beta,
+#                          seed = 1234,
+#                          cores = Ncores)
+#
+# summary(modK1.0_deploy_combo)
+# saveRDS(modK1.0_deploy_combo, file.path(res_dir, "modK1.0_tidal01_deploy_combo.rds"))
+
+mod0.5_deploy_combo = eDNA_lmer(Cq ~ scale(K0.5) + stand_dist + deploy_combo + Species + Side + (1|FilterID),
+                tidal,
+                std_curve_alpha = tidal$std_alpha,
+                std_curve_beta = tidal$std_beta,
+                seed = 1234,
+                cores = Ncores)
+
+summary(mod0.5_deploy_combo)
+saveRDS(mod0.5_deploy_combo, file.path(res_dir, "m0.5_tidal01_deploy_combo.rds"))
+
+mod0.1_deploy_combo = eDNA_lmer(Cq ~ scale(K0.1) + stand_dist + deploy_combo +  Species + Side + (1|FilterID),
+                tidal,
+                std_curve_alpha = tidal$std_alpha,
+                std_curve_beta = tidal$std_beta,
+                seed = 1234,
+                cores = Ncores)
+
+summary(mod0.1_deploy_combo)
+saveRDS(mod0.1_deploy_combo, file.path(res_dir, "m0.1_tidal01_deploy_combo.rds"))}
+
 }
