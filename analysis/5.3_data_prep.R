@@ -11,6 +11,7 @@
 # script outputs:
 #-------------------------------------------------------#
 ##   - data_clean/tidal5.3_cleaned.rds
+##   - data_clean/tidal5.3_cleaned_with_flow.rds
 
 library(data.table)
 #-------------------------------------------------------#
