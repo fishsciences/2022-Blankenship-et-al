@@ -26,12 +26,13 @@ m5.3 = readRDS(file.path(res_dir, "5.3_model_sidefit.rds")) # this was the bette
 
 # Model comparison, Tidal Expt 5.1 (October 2019)
 # rough guide is the elpd_diff has to be more than 2x the se_diff for one model to be preferred
+# first compare 2 sets separately (to see if one K value is better than another), then compare all six together to see if there is a best overall model fit
 #-------------------------------------------------------#
 lhi = loo::loo(m5.1_hi)
 lmed = loo::loo(m5.1_med)
 llo = loo::loo(m5.1_lo)
 
-m5.1_comp = data.frame(loo::loo_compare(lhi, lmed, llo), digits = 2)
+m5.1_comp = loo::loo_compare(lhi, lmed, llo)
 m5.1_comp = data.frame(
                       cbind(Model = c("K = 1.0 (modK1.0_tidal01.rds)",
                                        "K = 0.5 (m0.5_tidal01.rds)",
@@ -39,20 +40,22 @@ m5.1_comp = data.frame(
                              m5.1_comp)
                        )
 
+m5.1_comp = apply(m5.1_comp[ , c(2:9)], 2, function(x) round(as.numeric(x), 2))
+
 write.csv("results/m5.1_comp.csv", row.names = TRUE)
 #-------------------------------------------------------#
 # dispersal, expt 5.1
 
 K1_disp = readRDS(file.path(res_dir, "modK1.0_tidal01_disp.rds"))
-summary(K1_disp)
+lhi_disp = loo::loo(K1_disp)
 
 K05_disp = readRDS(file.path(res_dir, "m0.5_tidal01_disp.rds"))
-summary(K05_disp)
+lmed_disp = loo::loo(K05_disp)
 
 Kpt1_disp = readRDS(file.path(res_dir, "m0.1_tidal01_disp.rds"))
-summary(Kpt1_disp)
+llo_disp = loo::loo(Kpt1_disp)
 
-disp = loo::loo_compare(loo::loo(K1_disp), loo::loo(K05_disp), loo::loo(Kpt1_disp), digits = 2) #
+disp = loo::loo_compare(lhi_disp, lmed_disp, llo_disp) #
 
 m5.1_disp_comp = data.frame(
                       cbind(Model = c("K = 1.0 (modK1.0_tidal01_disp.rds)",
@@ -63,7 +66,10 @@ m5.1_disp_comp = data.frame(
 
 write.csv(m5.1_disp_comp, "results/m5.1_disp_comp.csv", row.names = TRUE)
 #-------------------------------------------------------#
+# full comparison
 
+m5.1_allmodels = loo::loo_compare(lhi, lmed, llo, lhi_disp, lmed_disp, llo_disp)
+write.csv(m5.1_allmodels, "results/m5.1_allmodels.csv", row.names = TRUE)
 
 
 # Model comparison, Expt 5.3 (Dec 2020)
