@@ -108,9 +108,12 @@ ggplot(tidal, aes(x = factor(as.numeric(since_removal)), y = factor(detection)))
 # Models
 
 if(refit_models) {
-modK1.0_disp = eDNA_lmer(Cq ~ scale(K1.0) + stand_dist +
-                             disp +
-                             Species + Side + (1|FilterID),
+modK1.0_disp = eDNA_lmer(Cq ~ scale(K1.0) +
+                              stand_dist +
+                              disp +
+                              Species +
+                              Side +
+                              (1|FilterID),
                          data = tidal,
                          std_curve_alpha = tidal$std_alpha,
                          std_curve_beta = tidal$std_beta,
