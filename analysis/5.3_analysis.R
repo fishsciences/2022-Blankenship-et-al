@@ -19,7 +19,7 @@
 library(artemis)
 
 d = readRDS("data_clean/tidal5.3_cleaned_with_flow.rds")
-res_dir = "results" #"~/DropboxCFS/Tidal_results" # where the model fits are saved
+res_dir = "output" #"~/DropboxCFS/Tidal_results" # where the model fits are saved
 
 # stdcurvs - from elaphos::StdCrvKey.  Apply to 5.3 only
 stdcrvs = structure(list(StdCrvID = c("an-2019-10-29", "rbt-2019-07-16",
@@ -59,7 +59,7 @@ d$abs_dist_m = abs(d$dist)
 # Modeling 5.3
 #-------------------------------------------------------#
 Ncores = getOption("mc.cores", parallel::detectCores())
-refit_models = FALSE
+refit_models = TRUE
 
 if(refit_models){
 m1_old = eDNA_lmer(Cq ~ scale(abs_dist_m, mu, sd) + # mu and sd are scaled to 5.1
@@ -72,7 +72,7 @@ m1_old = eDNA_lmer(Cq ~ scale(abs_dist_m, mu, sd) + # mu and sd are scaled to 5.
                        seed = 20,
                        std_curve_alpha = d$std_alpha,
                        std_curve_beta = d$std_beta,
-                       cores = Ncores)
+                       parallel_chains = Ncores)
 
 summary(m1_old)
 saveRDS(m1_old, paste0(res_dir, "/5.3_model_fit2.rds")) }
@@ -89,7 +89,7 @@ m1_formula = eDNA_lmer(Cq ~ scale(abs_dist_m, mu, sd) +
                        seed = 20,
                        std_curve_alpha = d$std_alpha,
                        std_curve_beta = d$std_beta,
-                       cores = Ncores)
+                       parallel_chains = Ncores)
 
 saveRDS(m1_formula, paste0(res_dir, "/5.3_model_sidefit.rds"))}
 
@@ -116,7 +116,7 @@ m2 = eDNA_lmer(Cq ~ scale(dist) +
                        data = d,
                        std_curve_alpha = d$std_alpha,
                        std_curve_beta = d$std_beta,
-                       cores = Ncore)
+                       parallel_chains = Ncore)
 
 # Draft model - incomplete; not sure how to do multiple standard curves?
 d2 = d[d$Cq < 40, ]
@@ -129,5 +129,5 @@ m1_pos = eDNA_lmer(Cq ~ scale(dist) +
                        data = d2,
                        std_curve_alpha = d2$std_alpha,
                        std_curve_beta = d2$std_beta,
-                       cores = Ncores)
+                       parallel_chains = Ncores)
 }

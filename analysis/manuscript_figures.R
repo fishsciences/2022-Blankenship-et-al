@@ -11,7 +11,7 @@ library(fishpals)
 #-------------------------------------------------------#
 # Covariate effects  plot (Figure 2)
 
-allfx = read.csv("results/allfx.csv")
+allfx = read.csv("output/allfx.csv")
 str(allfx)
 colnames(allfx) = c("parm",
   "Mean",
@@ -31,7 +31,7 @@ i$parm2 = c("Distance (m)",
             # "Distance (m)",
             # "Target spp. (Delta Smelt)",
             # "Side (upstream)",
-            "Tracer concentration (K=1.0)",
+            #"Tracer concentration (K=1.0)",
             "Distance (m)",
             "Time elapsed since cage removal (hours)",
             "Target spp. (Delta Smelt)",

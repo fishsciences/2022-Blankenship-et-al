@@ -40,43 +40,25 @@ plot(Cq ~ SampleTime, tidal)
 
 # Model
 #-------------------------------------------------------#
-refit_models = FALSE
+refit_models = TRUE
 Ncores = getOption("mc.cores", parallel::detectCores())
 
 #-------------------------------------------------------#
 # 5.1 models
+# All K params were dropped
 if(refit_models){
 
-modK1.0 = eDNA_lmer(Cq ~ scale(K1.0) + stand_dist + Species + Side + (1|FilterID),
-                data = tidal,
-                std_curve_alpha = tidal$std_alpha,
-                std_curve_beta = tidal$std_beta,
-                seed = 1234,
-               cores = Ncores)
+  mod = eDNA_lmer(Cq ~ #scale(K1.0) +
+                    stand_dist + Species + Side + (1|FilterID),
+                  data = tidal,
+                  std_curve_alpha = tidal$std_alpha,
+                  std_curve_beta = tidal$std_beta,
+                  seed = 1234,
+                  parallel_chains = Ncores)
 
-summary(modK1.0)
-saveRDS(modK1.0, file.path(res_dir, "modK1.0_tidal01.rds"))
-
-
-mod0.5 = eDNA_lmer(Cq ~ scale(K0.5) + stand_dist + Species + Side + (1|FilterID),
-                tidal,
-                std_curve_alpha = tidal$std_alpha,
-                std_curve_beta = tidal$std_beta,
-                seed = 1234,
-                cores = Ncores)
-
-summary(mod0.5)
-saveRDS(mod0.5, file.path(res_dir, "m0.5_tidal01.rds"))
-
-mod0.1 = eDNA_lmer(Cq ~ scale(K0.1) + stand_dist + Species + Side + (1|FilterID),
-                tidal,
-                std_curve_alpha = tidal$std_alpha,
-                std_curve_beta = tidal$std_beta,
-                seed = 1234,
-                cores = Ncores)
-
-summary(mod0.1)
-saveRDS(mod0.1, file.path(res_dir, "m0.1_tidal01.rds")) }
+summary(mod)
+saveRDS(mod, file.path(res_dir, "mod_tidal01.rds"))
+}
 
 #-------------------------------------------------------#
 # Dispersion
@@ -108,7 +90,7 @@ ggplot(tidal, aes(x = factor(as.numeric(since_removal)), y = factor(detection)))
 # Models
 
 if(refit_models) {
-modK1.0_disp = eDNA_lmer(Cq ~ scale(K1.0) +
+mod_disp = eDNA_lmer(Cq ~ #scale(K1.0) +
                               stand_dist +
                               disp +
                               Species +
@@ -118,31 +100,11 @@ modK1.0_disp = eDNA_lmer(Cq ~ scale(K1.0) +
                          std_curve_alpha = tidal$std_alpha,
                          std_curve_beta = tidal$std_beta,
                          seed = 1234,
-                         cores = Ncores)
+                         parallel_chains = Ncores)
 
-summary(modK1.0_disp)
-saveRDS(modK1.0_disp, file.path(res_dir, "modK1.0_tidal01_disp.rds"))
-
-mod0.5_disp = eDNA_lmer(Cq ~ scale(K0.5) + stand_dist + disp + Species + Side + (1|FilterID),
-                tidal,
-                std_curve_alpha = tidal$std_alpha,
-                std_curve_beta = tidal$std_beta,
-                seed = 1234,
-                cores = Ncores)
-
-summary(mod0.5_disp)
-saveRDS(mod0.5_disp, file.path(res_dir, "m0.5_tidal01_disp.rds"))
-
-mod0.1_disp = eDNA_lmer(Cq ~ scale(K0.1) + stand_dist + disp +  Species + Side + (1|FilterID),
-                tidal,
-                std_curve_alpha = tidal$std_alpha,
-                std_curve_beta = tidal$std_beta,
-                seed = 1234,
-                cores = Ncores)
-
-summary(mod0.1_disp)
-saveRDS(mod0.1_disp, file.path(res_dir, "m0.1_tidal01_disp.rds")) }
-
+summary(mod_disp)
+saveRDS(mod_disp, file.path(res_dir, "mod_tidal01_disp.rds"))
+}
 
 #-------------------------------------------------------#
 # Compare with CVP and delta distance effects
@@ -158,7 +120,7 @@ crvs = elaphos::StdCrvKey[elaphos::StdCrvKey$StdCrvID %in% cvps$StdCrvID,
                           c("StdCrvID", "StdCrvAlpha_lnForm", "StdCrvBeta_lnForm")]
 
 cvps$std_alpha = crvs$StdCrvAlpha_lnForm
-cvps$std_beta = crvs$StdCrvBeta_lnForm
+cvps$std_beta = as.numeric(crvs$StdCrvBeta_lnForm)
 len(cvps$FilterID)
 
 if(refit_models){
@@ -168,10 +130,11 @@ uni_mod = eDNA_lmer(Cq ~ scale(Distance_m) + scale(Volume_mL) + (1|FilterID),
                 std_curve_alpha = cvps$std_alpha,
                 std_curve_beta = cvps$std_beta,
                 seed = 1234,
-                cores = Ncores)
+                parallel_chains = Ncores)
 
 summary(uni_mod)
-saveRDS(uni_mod, file.path(res_dir, "uni_mod.rds"))}
+  saveRDS(uni_mod, file.path(res_dir, "uni_mod.rds"))
+}
 
 if(FALSE){ # old models and qaqc code
 
@@ -208,7 +171,7 @@ if(refit_models){
 #                          std_curve_alpha = tidal$std_alpha,
 #                          std_curve_beta = tidal$std_beta,
 #                          seed = 1234,
-#                          cores = Ncores)
+#                          parallel_chains = Ncores)
 #
 # summary(modK1.0_deploy_combo)
 # saveRDS(modK1.0_deploy_combo, file.path(res_dir, "modK1.0_tidal01_deploy_combo.rds"))
@@ -218,7 +181,7 @@ mod0.5_deploy_combo = eDNA_lmer(Cq ~ scale(K0.5) + stand_dist + deploy_combo + S
                 std_curve_alpha = tidal$std_alpha,
                 std_curve_beta = tidal$std_beta,
                 seed = 1234,
-                cores = Ncores)
+                parallel_chains = Ncores)
 
 summary(mod0.5_deploy_combo)
 saveRDS(mod0.5_deploy_combo, file.path(res_dir, "m0.5_tidal01_deploy_combo.rds"))
@@ -228,7 +191,7 @@ mod0.1_deploy_combo = eDNA_lmer(Cq ~ scale(K0.1) + stand_dist + deploy_combo +  
                 std_curve_alpha = tidal$std_alpha,
                 std_curve_beta = tidal$std_beta,
                 seed = 1234,
-                cores = Ncores)
+                parallel_chains = Ncores)
 
 summary(mod0.1_deploy_combo)
 saveRDS(mod0.1_deploy_combo, file.path(res_dir, "m0.1_tidal01_deploy_combo.rds"))}
