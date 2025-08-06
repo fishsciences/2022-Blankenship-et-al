@@ -27,20 +27,10 @@ i = allfx[-c(alphas,sigmas), ]
 i = i[-2, ]
 
 i$parm2 = c("Distance (m)",
-            # "Eddy diffusivity (K=0.5)",
-            # "Distance (m)",
-            # "Target spp. (Delta Smelt)",
-            # "Side (upstream)",
-            #"Tracer concentration (K=1.0)",
             "Distance (m)",
             "Time elapsed since cage removal (hours)",
             "Target spp. (Delta Smelt)",
             "Side (north)",
-            # "Eddy diffusivity (K=0.5)",
-            # "Distance (m)",
-            # "Time deployed*elapsed (hrs)",
-            # "Target spp. (Delta Smelt)",
-            # "Side (upstream)",
             "Distance (m)",
             "Target spp. (Delta Smelt)",
             "Target spp. (steelhead trout)",
@@ -62,8 +52,6 @@ ggplot(aes(y = Median, x = parm2)) +
              alpha = 0.75) +
   geom_linerange(aes(ymin = lwr,
                    ymax = upr,
-                   # xmin = reorder(parm2, Model),
-                   # xmax = reorder(parm2, Model),
                    group = Model,
                    color = Model),
                size = 1,
@@ -121,12 +109,12 @@ mu = mean(tidal$abs_dist_m)
 sd = sd(tidal$abs_dist_m)
 tidal$stand_dist = scale(tidal$abs_dist_m, mu, sd) # scale distances
 
-# stdcurvs - from elaphos::StdCrvKey.  
+# stdcurvs - 
 stdcrvs = structure(list(
   StdCrvID = c("an-2019-10-29", "ds-2019-10-29"), 
-StdCrvAlpha_lnForm = c(18.441, 20.583), 
-StdCrvBeta_lnForm = c(-1.545, -1.486)), 
-row.names = c(3L, 4L), class = "data.frame")
+  StdCrvAlpha_lnForm = c(18.441, 20.583), 
+  StdCrvBeta_lnForm = c(-1.545, -1.486)), 
+  row.names = c(3L, 4L), class = "data.frame")
 
 stdcrvs$Sp_abbv = c("Anchovy", "Delta Smelt")
 i = match(tidal$Species, stdcrvs$Sp_abbv)
@@ -142,7 +130,6 @@ ts_ix = tidal |>
   ungroup()
 
 ds_plot = tidal |> 
- # filter(Species == "Delta Smelt") |> 
   select(SampleTime, Cq, `K0.5`, Distance_m, Species) |> 
   group_by(Distance_m, SampleTime, Species) |> 
   summarize(npos = sum(Cq < 40),
@@ -164,10 +151,8 @@ t5.1$stg_scaled = -1*(sd(ds_plot$Distance_m)*(scale(t5.1$parameter_value)) + mea
 #-------------------------------------------------------#
 ggplot(ds_plot, aes(y = Distance_m, x = SampleTime)) +
   geom_point(
-    ## geom_raster(
     aes(
       shape = prop_pos > 0,
-      ## fill = prop_pos,
       size = prop_pos
     )
   ) +
@@ -177,19 +162,6 @@ ggplot(ds_plot, aes(y = Distance_m, x = SampleTime)) +
              aes(
                  x = datetime, y = stg_scaled),
              alpha = 0.85) +
-  ##   scale_fill_gradient(low = "white", high = "gray20",
-  ##                       aesthetics = "fill",
-  ##                       ## limits = c(0.0, 0.61),
-  ##                       breaks = c(0.0, 0.25, 0.50, 0.6),
-                        
-  ##                       guide = guide_legend(
-  ##                           title = "Proportion Positive",
-  ##                           ## override.aes = list(shape = 21, 
-  ##                                               ## size = 4),
-  ##                           ## breaks = c(0.01, 0.25, 0.50, 0.6)
-  ##                         )
-  ##                       ) + 
-  ## guides(shape = "none", size = "none", color = "none") +
   scale_shape_manual(values = c(1, 20),
                      guide = guide_legend(
                      title = "Positive sample")) + 
@@ -223,7 +195,6 @@ range(t5.1$parameter_value)
 tidal$conc = artemis::cq_to_lnconc(tidal$Cq, tidal$std_alpha, tidal$std_beta)
 
 tidal |> 
-  #filter(Cq < 40) |> 
   mutate(livecar_status = ifelse(SampleTime >= lubridate::ymd_hms("2019-10-23 08:05:00", tz = "America/Los_Angeles"), "out", "in")) |> 
 
 ggplot(aes(x = livecar_status, y = conc)) +
@@ -256,7 +227,6 @@ tr_ix = d |>
   ungroup()
 
 sth_plot = d |> 
-   # filter(Target == "STH" ) |> #, Cq < 40) |> 
   select(Target, interval_datetime, Cq, river_stage_ft, velocity_f.s, dist, Species) |> 
   group_by(dist, interval_datetime, Species) |> 
   summarize(npos = sum(Cq < 40),
@@ -300,9 +270,7 @@ ggplot(sth_plot,
        aes(y = dist, x = interval_datetime)) +
   geom_point(
     
-  ## geom_raster(
     aes(
-            ## fill = prop_pos ,
             size = prop_pos,
             shape = prop_pos > 0,
         )
@@ -313,24 +281,12 @@ ggplot(sth_plot,
              aes(
                  x = datetime, y = stg_scaled),
             alpha = 0.85) +
-  ##   scale_fill_gradient(low = "white", high = "gray20",
-  ##                       aesthetics = "fill",
-  ##                       ## limits = c(0.01, 0.61),
-  ##                       ## breaks = c(0.01, 0.25, 0.50, 0.6),
-                        
-  ##                       guide = guide_legend(
-  ##                           title = "Proportion Positive",
-  ##                           override.aes = list(shape = 21, 
-  ##                                               size = 4),
-  ##                           breaks = c(0.01, 0.25, 0.50, 0.6))
-  ##                       ) +
   scale_shape_manual(values = c(1, 20),
                      guide = guide_legend(
                        title = "Positive sample")) + 
   scale_size(breaks = c(0.01, 0.1, 0.2),
              guide = guide_legend(title = "Proportion positive",
                                   breaks = c(0.01, 0.25, 0.5, 0.75))) + 
-  ## guides(shape = "none", size = "none", color = "none") +
   scale_y_continuous(breaks = c(-300, -100, -50, -25, 0, 25, 50, 100, 300),
                      labels = c("-600",
                                 "-100",
@@ -393,9 +349,6 @@ ggplot(sth_plot[sth_plot$prop_pos > 0, ], aes(y = dist, x = interval_datetime)) 
   ) +
   labs(x = "Sampling time",
        y = "Distance from livecar (m)") +
-  # facet_wrap(~interval_datetime ,
-  #            ncol = 1
-  #            ) +
   geom_smooth(data = sth_plot[sth_plot$prop_pos > 0, ],
     aes( x = interval_datetime, y = vel_max_scaled),
     size = 0.35,
