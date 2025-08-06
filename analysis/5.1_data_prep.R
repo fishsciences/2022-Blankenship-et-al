@@ -5,16 +5,16 @@
 
 # script inputs:
 #-------------------------------------------------------#
-##   - tidal01 (elaphos)
 ##   - hydro data (data/hydro)
 
 # script outputs:
 #-------------------------------------------------------#
 ##   - data_clean/tidal5.1_w_hydro.rds; this is the input to analysis/5.1_analysis.R
 
-library(elaphos)
 source("analysis/functions.R") # data cleaning and hydro joining functions
 res_dir = "data_clean" # for storing cleaned data (output of this script)
+
+tidal01 = readRDS("data/tidal01.rds") # formally contained in elaphos
 
 ## Combine with hydro model output
 fs = list.files("data/hydro", full.names = TRUE)
