@@ -55,6 +55,7 @@ cqs = lapply(cq_files, FUN = elaphos::read_qpcr, Experiment = "Tidal_5.3")
 cqs = do.call(rbind, cqs)
 saveRDS(cqs, file = "data/exp5.3_cq.rds")
 }
+
 cqs = readRDS("data/exp5.3_cq.rds")
 #-------------------------------------------------------#
 

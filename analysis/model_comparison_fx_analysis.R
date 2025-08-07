@@ -4,8 +4,7 @@
 # Wed Jun 16 14:14:10 2021 ------------------------------
 
 library(loo)
-res_dir = "output" #"~/DropboxCFS/Tidal_results" - old results for comparison
-#res_dir = "~/DropboxCFS/Tidal_results/"
+res_dir = "output" 
 
 # Load fit model objects
 #-------------------------------------------------------#
