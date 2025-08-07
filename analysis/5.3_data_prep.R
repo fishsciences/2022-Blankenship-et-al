@@ -46,12 +46,16 @@ meta$date = as.Date(meta$date)
 
 # Raw PCR data
 #-------------------------------------------------------#
+if(FALSE){ # depends on elaphos package, which is not generally available
 cq_files = list.files("data/Expt5.3_xls/",
                       pattern = ".xls", full.names = TRUE)
 
 
 cqs = lapply(cq_files, FUN = elaphos::read_qpcr, Experiment = "Tidal_5.3")
 cqs = do.call(rbind, cqs)
+saveRDS(cqs, file = "data/exp5.3_cq.rds")
+}
+cqs = readRDS("data/exp5.3_cq.rds")
 #-------------------------------------------------------#
 
 

@@ -110,14 +110,9 @@ saveRDS(mod_disp, file.path(res_dir, "mod_tidal01_disp.rds"))
 # Compare with CVP and delta distance effects
 # Unidirectional data: keep the volume columns for all, because volume is different from uni to tidal
 
-library(elaphos)
-cvps = rbind(elaphos::cvp01, elaphos::cvp02)
+cvps = readRDS("data/cvp_unidirectional.rds")
 
-#delta04 = "ds-2019-03-08"
-#otherwise = "ds-2018-09-27"
-
-crvs = elaphos::StdCrvKey[elaphos::StdCrvKey$StdCrvID %in% cvps$StdCrvID,
-                          c("StdCrvID", "StdCrvAlpha_lnForm", "StdCrvBeta_lnForm")]
+crvs = readRDS("data/unidirectional_std_crvs.rds")
 
 cvps$std_alpha = crvs$StdCrvAlpha_lnForm
 cvps$std_beta = as.numeric(crvs$StdCrvBeta_lnForm)

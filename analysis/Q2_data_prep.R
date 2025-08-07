@@ -4,11 +4,11 @@
 #-------------------------------------------------------#
 
 library(artemis)
-library(elaphos)
+## library(elaphos)
 
 # Data
 all_uni = readRDS("data/all_unidirectional_expts.rds")
-cvps = rbind(cvp01, cvp02)
+cvps = readRDS("data/cvp_unidirectional.rds")
 
 d5.3 = readRDS("data_clean/tidal5.3_cleaned_with_flow.rds")
 d5.1 = readRDS("data_clean/tidal5.1_w_hydro.rds")
